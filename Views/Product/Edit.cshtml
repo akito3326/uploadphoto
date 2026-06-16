@@ -1,0 +1,292 @@
+@model uploadphoto.Models.ProductViewModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-circle me-3 p-2 d-inline-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-arrow-left"></i>
+                        </a>
+                        <h2 class="h3 fw-bold text-dark mb-0">Chỉnh sửa sản phẩm</h2>
+                    </div>
+
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data" id="uploadForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <!-- Left: Basic Info -->
+                            <div class="col-md-7">
+                                <div class="mb-3">
+                                    <label asp-for="Name" class="form-label fw-semibold text-muted small"></label>
+                                    <input asp-for="Name" class="form-control form-control-lg rounded-3" />
+                                    <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="Price" class="form-label fw-semibold text-muted small"></label>
+                                    <div class="input-group input-group-lg">
+                                        <input asp-for="Price" type="number" step="1000" class="form-control rounded-start-3" />
+                                        <span class="input-group-text bg-light border-start-0 rounded-end-3 text-muted">VND</span>
+                                    </div>
+                                    <span asp-validation-for="Price" class="text-danger small mt-1 d-block"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="ImageFiles" class="form-label fw-semibold text-muted small">Tải thêm hình ảnh mới</label>
+                                    
+                                    <div class="upload-zone rounded-4 p-4 text-center border-dashed position-relative bg-light transition-all" id="dropZone" style="height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                        <input asp-for="ImageFiles" type="file" multiple class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" id="fileInput" accept=".jpg,.jpeg,.png" />
+                                        <i class="bi bi-cloud-upload-fill fs-2 text-primary mb-2"></i>
+                                        <h6 class="fw-semibold mb-0">Kéo thả hoặc nhấp để tải thêm ảnh</h6>
+                                        <p class="text-muted small mb-0" style="font-size: 11px;">Hỗ trợ .jpg, .jpeg, .png</p>
+                                    </div>
+                                    <span asp-validation-for="ImageFiles" class="text-danger small mt-1 d-block" id="validationError"></span>
+                                </div>
+
+                                <!-- New Image Previews -->
+                                <div class="mb-4 d-none" id="previewContainer">
+                                    <h6 class="fw-semibold text-muted mb-2">Ảnh mới sẽ thêm:</h6>
+                                    <div class="row row-cols-3 g-2" id="previewGrid">
+                                        <!-- New previews will go here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Existing Images -->
+                            <div class="col-md-5 border-start-md ps-md-4">
+                                <h5 class="fw-bold text-dark mb-3">Hình ảnh hiện tại</h5>
+                                
+                                @if (Model.ExistingImageUrls == null || !Model.ExistingImageUrls.Any())
+                                {
+                                    <div class="alert alert-light text-center border p-4 rounded-3 text-muted">
+                                        <i class="bi bi-images display-6 mb-2 d-block"></i>
+                                        Sản phẩm chưa có hình ảnh nào.
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="row row-cols-2 g-3" id="existingImagesGrid">
+                                        @foreach (var imageUrl in Model.ExistingImageUrls)
+                                        {
+                                            <div class="col img-container-col" data-image-url="@imageUrl">
+                                                <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden position-relative ratio ratio-1x1">
+                                                    <img src="@imageUrl" class="object-fit-cover" alt="Product image" />
+                                                    <div class="position-absolute top-0 end-0 p-1 bg-gradient-dark-top z-3">
+                                                        <button type="button" class="btn btn-danger btn-sm rounded-circle p-1 shadow delete-image-btn" 
+                                                                data-product-id="@Model.Id" data-image-url="@imageUrl"
+                                                                style="width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;">
+                                                            <i class="bi bi-trash-fill" style="font-size: 12px;"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <hr class="my-4 text-muted opacity-25" />
+
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a asp-action="Index" class="btn btn-light btn-lg px-4 rounded-pill">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                                <i class="bi bi-check-circle-fill"></i> Cập nhật sản phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        .border-dashed {
+            border: 2px dashed #dee2e6;
+        }
+        .upload-zone {
+            cursor: pointer;
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.03) !important;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+        }
+        .ratio-1x1 {
+            aspect-ratio: 1;
+        }
+        .object-fit-cover {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+        .z-3 {
+            z-index: 3;
+        }
+        .preview-img-wrapper {
+            position: relative;
+            aspect-ratio: 1;
+        }
+        .preview-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @@media (min-width: 768px) {
+            .border-start-md {
+                border-left: 1px solid #dee2e6 !important;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fileInput = document.getElementById("fileInput");
+            const dropZone = document.getElementById("dropZone");
+            const previewContainer = document.getElementById("previewContainer");
+            const previewGrid = document.getElementById("previewGrid");
+            const validationError = document.getElementById("validationError");
+
+            // Drag over events
+            ["dragenter", "dragover"].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add("dragover");
+                }, false);
+            });
+
+            ["dragleave", "drop"].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove("dragover");
+                }, false);
+            });
+
+            // Handle drop
+            dropZone.addEventListener("drop", (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                fileInput.files = files;
+                handleFiles(files);
+            });
+
+            // Handle file selection
+            fileInput.addEventListener("change", function () {
+                handleFiles(this.files);
+            });
+
+            function handleFiles(files) {
+                previewGrid.innerHTML = "";
+                validationError.textContent = "";
+                
+                if (files.length === 0) {
+                    previewContainer.classList.add("d-none");
+                    return;
+                }
+
+                previewContainer.classList.remove("d-none");
+                let hasInvalidFile = false;
+                const allowedExtensions = ["jpg", "jpeg", "png"];
+
+                Array.from(files).forEach((file) => {
+                    const extension = file.name.split('.').pop().toLowerCase();
+                    if (!allowedExtensions.includes(extension)) {
+                        hasInvalidFile = true;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const col = document.createElement("div");
+                        col.className = "col";
+                        
+                        let cardContent = `
+                            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden preview-img-wrapper">
+                                <img src="${e.target.result}" alt="${file.name}">
+                                <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-70 text-white p-1 text-truncate text-center small" style="font-size: 9px;">
+                                    ${file.name}
+                                </div>
+                            </div>
+                        `;
+
+                        if (!allowedExtensions.includes(extension)) {
+                            cardContent = `
+                                <div class="card h-100 border border-danger shadow-sm rounded-3 overflow-hidden preview-img-wrapper bg-danger-subtle d-flex flex-column justify-content-center align-items-center p-2 text-danger text-center">
+                                    <i class="bi bi-exclamation-triangle-fill fs-4 mb-1"></i>
+                                    <span class="fw-semibold text-truncate w-100" style="font-size: 9px;">Lỗi định dạng</span>
+                                </div>
+                            `;
+                        }
+
+                        col.innerHTML = cardContent;
+                        previewGrid.appendChild(col);
+                    }
+                    reader.readAsDataURL(file);
+                });
+
+                if (hasInvalidFile) {
+                    validationError.textContent = "Chỉ chấp nhận các tập tin ảnh có định dạng .jpg, .jpeg, hoặc .png.";
+                }
+            }
+
+            // AJAX Delete Image
+            document.querySelectorAll(".delete-image-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    if (confirm("Bạn có chắc muốn xóa hình ảnh này khỏi sản phẩm?")) {
+                        const productId = this.getAttribute("data-product-id");
+                        const imageUrl = this.getAttribute("data-image-url");
+                        const colElement = this.closest(".img-container-col");
+
+                        const formData = new FormData();
+                        formData.append("productId", productId);
+                        formData.append("imageUrl", imageUrl);
+
+                        fetch('/Product/DeleteImage', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Remove element from UI
+                                colElement.remove();
+                                
+                                // Check if there are any images left
+                                const remainingImages = document.querySelectorAll("#existingImagesGrid .img-container-col");
+                                if (remainingImages.length === 0) {
+                                    const grid = document.getElementById("existingImagesGrid");
+                                    grid.outerHTML = `
+                                        <div class="alert alert-light text-center border p-4 rounded-3 text-muted">
+                                            <i class="bi bi-images display-6 mb-2 d-block"></i>
+                                            Sản phẩm chưa có hình ảnh nào.
+                                        </div>
+                                    `;
+                                }
+                            } else {
+                                alert("Xóa ảnh thất bại: " + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("Đã xảy ra lỗi khi thực hiện yêu cầu.");
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

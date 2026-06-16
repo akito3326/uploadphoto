@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "Trang chủ - Bài tập Upload hình ảnh";
+}
+
+<div class="container py-5">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-semibold text-uppercase tracking-wider">Bài Tập ASP.NET Core</span>
+            <h1 class="display-4 fw-bold text-dark mb-4">Bài tập Upload hình ảnh sản phẩm</h1>
+            <p class="fs-5 text-muted mb-4">
+                Dự án demo cho phép upload một hoặc nhiều hình ảnh cho sản phẩm với điều kiện chỉ chấp nhận định dạng ảnh JPG/PNG. Giao diện được thiết kế hiện đại, hỗ trợ xem trước hình ảnh (preview) trước khi tải lên và xóa ảnh qua cơ chế AJAX.
+            </p>
+            
+            <div class="d-flex flex-wrap gap-3 mb-5">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-primary btn-lg px-4 py-3 rounded-pill shadow-sm">
+                    <i class="bi bi-folder2-open me-2"></i> Đi tới Quản lý sản phẩm
+                </a>
+                <a asp-controller="Product" asp-action="Create" class="btn btn-outline-secondary btn-lg px-4 py-3 rounded-pill">
+                    <i class="bi bi-plus-circle me-2"></i> Thêm sản phẩm mới
+                </a>
+            </div>
+
+            <div class="row g-4 border-top pt-4">
+                <div class="col-sm-6">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success-subtle text-success p-3 rounded-circle me-3">
+                            <i class="bi bi-check-lg fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Upload an toàn</h6>
+                            <p class="text-muted small mb-0">Chỉ chấp nhận file .jpg, .jpeg, .png</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info-subtle text-info p-3 rounded-circle me-3">
+                            <i class="bi bi-images fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Nhiều hình ảnh</h6>
+                            <p class="text-muted small mb-0">Hỗ trợ tải lên nhiều hình ảnh cùng lúc</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center">
+            <div class="position-relative d-inline-block">
+                <div class="bg-primary opacity-10 position-absolute w-100 h-100 rounded-5 blur-3xl start-50 top-50 translate-middle" style="z-index: -1;"></div>
+                <i class="bi bi-cloud-arrow-up display-1 text-primary animate-bounce" style="font-size: 10rem;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .animate-bounce {
+            animation: bounce 3s infinite;
+        }
+        @@keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+}

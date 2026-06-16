@@ -1,0 +1,215 @@
+@model uploadphoto.Models.ProductViewModel
+
+@{
+    ViewData["Title"] = "Thêm sản phẩm mới";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-circle me-3 p-2 d-inline-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-arrow-left"></i>
+                        </a>
+                        <h2 class="h3 fw-bold text-dark mb-0">Thêm sản phẩm mới</h2>
+                    </div>
+
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" id="uploadForm">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-semibold text-muted small"></label>
+                            <input asp-for="Name" class="form-control form-control-lg rounded-3" placeholder="Nhập tên sản phẩm..." />
+                            <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Price" class="form-label fw-semibold text-muted small"></label>
+                            <div class="input-group input-group-lg">
+                                <input asp-for="Price" type="number" step="1000" class="form-control rounded-start-3" placeholder="0" />
+                                <span class="input-group-text bg-light border-start-0 rounded-end-3 text-muted">VND</span>
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ImageFiles" class="form-label fw-semibold text-muted small"></label>
+                            
+                            <!-- Custom Drag-and-drop / Upload Box -->
+                            <div class="upload-zone rounded-4 p-5 text-center border-dashed position-relative bg-light transition-all" id="dropZone">
+                                <input asp-for="ImageFiles" type="file" multiple class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" id="fileInput" accept=".jpg,.jpeg,.png" />
+                                <i class="bi bi-cloud-upload display-4 text-primary mb-3 d-block"></i>
+                                <h5 class="fw-semibold mb-1">Kéo thả hoặc nhấp để chọn ảnh</h5>
+                                <p class="text-muted small mb-0">Chấp nhận định dạng .jpg, .jpeg, .png (Có thể chọn nhiều hình ảnh)</p>
+                            </div>
+                            
+                            <span asp-validation-for="ImageFiles" class="text-danger small mt-1 d-block" id="validationError"></span>
+                        </div>
+
+                        <!-- Image Preview Grid -->
+                        <div class="mb-4 d-none" id="previewContainer">
+                            <h6 class="fw-semibold text-muted mb-3">Hình ảnh đã chọn:</h6>
+                            <div class="row row-cols-3 row-cols-sm-4 g-3" id="previewGrid">
+                                <!-- Previews will be dynamically added here -->
+                            </div>
+                        </div>
+
+                        <hr class="my-4 text-muted opacity-25" />
+
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a asp-action="Index" class="btn btn-light btn-lg px-4 rounded-pill">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                                <i class="bi bi-check-circle-fill"></i> Lưu sản phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        .border-dashed {
+            border: 2px dashed #dee2e6;
+        }
+        .upload-zone {
+            cursor: pointer;
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.03) !important;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+        }
+        .preview-img-wrapper {
+            position: relative;
+            aspect-ratio: 1;
+        }
+        .preview-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .preview-remove-btn:hover {
+            background-color: #dc3545;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fileInput = document.getElementById("fileInput");
+            const dropZone = document.getElementById("dropZone");
+            const previewContainer = document.getElementById("previewContainer");
+            const previewGrid = document.getElementById("previewGrid");
+            const validationError = document.getElementById("validationError");
+
+            // Drag over events
+            ["dragenter", "dragover"].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add("dragover");
+                }, false);
+            });
+
+            ["dragleave", "drop"].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove("dragover");
+                }, false);
+            });
+
+            // Handle drop
+            dropZone.addEventListener("drop", (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                fileInput.files = files;
+                handleFiles(files);
+            });
+
+            // Handle file selection
+            fileInput.addEventListener("change", function () {
+                handleFiles(this.files);
+            });
+
+            function handleFiles(files) {
+                previewGrid.innerHTML = "";
+                validationError.textContent = "";
+                
+                if (files.length === 0) {
+                    previewContainer.classList.add("d-none");
+                    return;
+                }
+
+                previewContainer.classList.remove("d-none");
+                let hasInvalidFile = false;
+                const allowedExtensions = ["jpg", "jpeg", "png"];
+
+                Array.from(files).forEach((file, index) => {
+                    const extension = file.name.split('.').pop().toLowerCase();
+                    if (!allowedExtensions.includes(extension)) {
+                        hasInvalidFile = true;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const col = document.createElement("div");
+                        col.className = "col";
+                        
+                        let cardContent = `
+                            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden preview-img-wrapper">
+                                <img src="${e.target.result}" alt="${file.name}">
+                                <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-70 text-white p-1 text-truncate text-center small" style="font-size: 10px;">
+                                    ${file.name}
+                                </div>
+                            </div>
+                        `;
+
+                        // If file is invalid format, show a warning style overlay
+                        if (!allowedExtensions.includes(extension)) {
+                            cardContent = `
+                                <div class="card h-100 border border-danger shadow-sm rounded-3 overflow-hidden preview-img-wrapper bg-danger-subtle d-flex flex-column justify-content-center align-items-center p-2 text-danger text-center">
+                                    <i class="bi bi-exclamation-triangle-fill fs-3 mb-1"></i>
+                                    <span class="fw-semibold text-truncate w-100" style="font-size: 10px;">Lỗi định dạng</span>
+                                    <span class="text-truncate w-100" style="font-size: 8px;">${file.name}</span>
+                                </div>
+                            `;
+                        }
+
+                        col.innerHTML = cardContent;
+                        previewGrid.appendChild(col);
+                    }
+                    reader.readAsDataURL(file);
+                });
+
+                if (hasInvalidFile) {
+                    validationError.textContent = "Chỉ chấp nhận các tập tin ảnh có định dạng .jpg, .jpeg, hoặc .png.";
+                }
+            }
+        });
+    </script>
+}
