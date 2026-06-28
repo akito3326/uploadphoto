@@ -1,1 +1,0 @@
-This is a test text file to verify that the upload photo application correctly rejects non-image files.

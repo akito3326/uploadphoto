@@ -95,3 +95,4 @@ D:\uploadphoto\obj\Debug\net10.0\refint\uploadphoto.dll
 D:\uploadphoto\obj\Debug\net10.0\uploadphoto.pdb
 D:\uploadphoto\obj\Debug\net10.0\uploadphoto.genruntimeconfig.cache
 D:\uploadphoto\obj\Debug\net10.0\ref\uploadphoto.dll
+D:\uploadphoto\obj\Debug\net10.0\uploadphoto.sourcelink.json
